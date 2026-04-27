@@ -1,0 +1,49 @@
+import { NextResponse } from "next/server";
+import { getPrisma } from "../../../../lib/db";
+import { clearAuthCookies, getRefreshToken } from "../../../../lib/cookies";
+import { createAuditLog } from "../../../../lib//audit";
+import type { ApiResponse } from "../../../../types";
+
+export async function POST() {
+  try {
+    const prisma = getPrisma();
+    const refreshToken = await getRefreshToken();
+    let userIdToAudit: string | null = null;
+
+    if (refreshToken) {
+      const storedRefreshToken = await prisma.refreshToken.findUnique({
+        where: { token: refreshToken },
+        select: { userId: true },
+      });
+      userIdToAudit = storedRefreshToken?.userId ?? null;
+
+      // Eliminar refresh token de la base de datos
+      await prisma.refreshToken.deleteMany({
+        where: { token: refreshToken },
+      });
+    }
+
+    if (userIdToAudit) {
+      await createAuditLog({
+        action: "LOGOUT",
+        entity: "auth",
+        userId: userIdToAudit,
+        entityId: userIdToAudit,
+      });
+    }
+
+    await clearAuthCookies();
+
+    return NextResponse.json(
+      { success: true, message: "Logout exitoso" } as ApiResponse,
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("[LOGOUT]", error);
+    return NextResponse.json(
+      { success: false, message: "Error interno del servidor" } as ApiResponse,
+      { status: 500 }
+    );
+  }
+}
+

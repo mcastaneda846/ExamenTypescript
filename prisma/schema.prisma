@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  CLIENTE
+  MEDICO
+}
+
+// 3) Estado del usuario
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+// 4) Estado del horario
+enum ScheduleStatus {
+  ACTIVE
+  CANCELLED
+}
+
+// 5) Tipos de acciones de auditoria
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  ROLE_CHANGE
+}
+
+// 6) Usuarios
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  role      Role       @default(CLIENTE)
+  status    UserStatus @default(ACTIVE)
+  profileUrl String?   // URL de la imagen de perfil
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  schedules      Schedule[]
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]     @relation("UserAuditLogs")
+  targetAudits   AuditLog[]     @relation("TargetAuditLogs")
+
+  @@map("users")
+}
+
+// 7) Horarios (para los médicos)
+model Schedule {
+  id          String         @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  status      ScheduleStatus @default(ACTIVE)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  auditLogs AuditLog[]
+
+  @@map("schedules")
+}
+
+// 8) Refresh tokens para sesiones
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// 9) Bitacora de auditoria
+model AuditLog {
+  id        String      @id @default(cuid())
+  action    AuditAction
+  entity    String
+  entityId  String?
+  oldValues Json?
+  newValues Json?
+  createdAt DateTime    @default(now())
+
+  userId String
+  user   User   @relation("UserAuditLogs", fields: [userId], references: [id])
+
+  targetId String?
+  target   User?   @relation("TargetAuditLogs", fields: [targetId], references: [id])
+
+  scheduleId String?
+  schedule   Schedule? @relation(fields: [scheduleId], references: [id])
+
+  @@map("audit_logs")
+}
