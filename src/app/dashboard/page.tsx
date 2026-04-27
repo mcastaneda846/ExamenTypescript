@@ -10,6 +10,7 @@ import type { UserDto } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import ProfilePictureSelector from "@/components/ProfilePictureSelector";
 
 type AuditLogItem = {
   id: string;
@@ -143,42 +144,41 @@ function DashboardContent() {
   return (
     <main className="min-h-screen bg-[#f8e1dc] p-4 md:p-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-    <section className="rounded-[2rem] border border-white/60 bg-white/90 p-6 shadow-[0_20px_60px_-25px_rgba(244,114,182,0.45)]">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900">
-            Horus Braslet
-          </h1>
-          <p className="mt-1 text-slate-800">Bienvenid@, {user.name}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Foto de perfil */}
-          {user.profileUrl ? (
-            <img
-              src={user.profileUrl}
-              alt="Foto de perfil"
-              className="w-18 h-18 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
-              <span>{user.name.charAt(0)}</span>
+        <section className="rounded-[2rem] border border-white/60 bg-white/90 p-6 shadow-[0_20px_60px_-25px_rgba(244,114,182,0.45)]">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-extrabold text-slate-900">
+                Horus Braslet
+              </h1>
+              <p className="mt-1 text-slate-800">Bienvenid@, {user.name}</p>
             </div>
-          )}
+            <div className="flex items-center gap-3">
+              {user.profileUrl ? (
+                <img
+                  src={user.profileUrl}
+                  alt="Foto de perfil"
+                  className="w-18 h-18 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+                  <span>{user.name.charAt(0)}</span>
+                </div>
+              )}
 
-          {/* Etiqueta de rol */}
-          <Badge tone="info">{roleLabel(user.role)}</Badge>
+              {/* Etiqueta de rol */}
+              <Badge tone="info">{roleLabel(user.role)}</Badge>
 
-          {/* Botón de Cerrar sesión */}
-          <Button
-            variant="secondary"
-            onClick={logout}
-            className="rounded-2xl text-slate-900"
-          >
-            Cerrar sesión
-          </Button>
-        </div>
-      </div>
-    </section>
+              {/* Botón de Cerrar sesión */}
+              <Button
+                variant="secondary"
+                onClick={logout}
+                className="rounded-2xl text-slate-900"
+              >
+                Cerrar sesión
+              </Button>
+            </div>
+          </div>
+        </section>
 
         {message ? (
           <p className="rounded-xl bg-green-100 p-3 text-green-900 font-medium">
