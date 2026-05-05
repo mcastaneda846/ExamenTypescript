@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import type { Role, UserStatus } from "@prisma/client";
+import type { Role, UserStatus } from "@/generated/prisma";
 import { verifyAccessToken } from "@/lib/jwt";
 import { getPrisma } from "@/lib/db";
 

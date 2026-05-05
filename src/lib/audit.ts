@@ -1,4 +1,4 @@
-import type { AuditAction, Prisma } from "@prisma/client";
+import type { AuditAction, Prisma } from "@/generated/prisma";
 import { getPrisma } from "@/lib/db";
 
 type AuditJson = Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
