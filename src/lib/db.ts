@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg"; //Le dice a prisma como conectarse con Postgres se importa un adapter
-import { PrismaClient } from "@prisma/client"; //Cliente ppal de prisma, se usa para hacer queries prisma.user...
+import { PrismaClient } from "@/generated/prisma";
 
 const globalForPrisma = globalThis as unknown as { 
   prisma: PrismaClient | undefined;
